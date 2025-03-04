@@ -16,17 +16,18 @@ class Contact extends Model
         'email',
         'phone',
         'notes',
-        'role_id',
+        'user_id',
     ];
+
+    // Relación con users
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     // Relación con eventos
     public function events()
     {
         return $this->hasMany(Event::class);
-    }
-    // Relación con roles
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
     }
 }
