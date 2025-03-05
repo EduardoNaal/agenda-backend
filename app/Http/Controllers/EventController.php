@@ -13,19 +13,16 @@ class EventController extends Controller
     public function index()
     {
         $user = Auth::user();
-
+    
         if ($user->hasRole('admin')) {
-            // Si es admin, obtiene todos los eventos
             $events = Event::all();
         } else {
-            // Si es usuario normal, obtiene solo sus eventos
-            $events = Event::whereHas('contact', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })->get();
+            $events = Event::where('user_id', $user->id)->get();
         }
-
+    
         return response()->json($events);
     }
+    
 
     // Crear un nuevo evento
     public function store(Request $request)
@@ -35,21 +32,16 @@ class EventController extends Controller
             'description' => 'nullable|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
-            'contact_id' => 'required|exists:contacts,id',
         ]);
-
+    
         $user = Auth::user();
-        $contact = Contact::find($validated['contact_id']);
-
-        // Verificar que el contacto pertenezca al usuario autenticado
-        if ($contact->user_id !== $user->id && !$user->hasRole('admin')) {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-
+        $validated['user_id'] = $user->id; // Asigna el evento al usuario autenticado
+    
         $event = Event::create($validated);
-
+    
         return response()->json($event, 201);
     }
+    
 
     // Obtener un evento por ID
     public function show(Event $event)
@@ -66,26 +58,25 @@ class EventController extends Controller
 
     // Actualizar un evento
     public function update(Request $request, Event $event)
-    {
-        $user = Auth::user();
+            {
+                $user = Auth::user();
 
-        // Verificar si el evento tiene un contacto asociado y si el usuario tiene permiso
-        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->hasRole('admin'))) {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+                if ($event->user_id !== $user->id && !$user->hasRole('admin')) {
+                    return response()->json(['message' => 'No autorizado'], 403);
+                }
 
-        $validated = $request->validate([
-            'title' => 'sometimes|string',
-            'description' => 'nullable|string',
-            'start_time' => 'sometimes|date',
-            'end_time' => 'sometimes|date|after:start_time',
-            'contact_id' => 'sometimes|exists:contacts,id',
-        ]);
+                $validated = $request->validate([
+                    'title' => 'sometimes|string',
+                    'description' => 'nullable|string',
+                    'start_time' => 'sometimes|date',
+                    'end_time' => 'sometimes|date|after:start_time',
+                ]);
 
-        $event->update($validated);
+                $event->update($validated);
 
-        return response()->json($event);
-    }
+                return response()->json($event);
+            }
+
 
     // Eliminar un evento
     public function destroy(Event $event)

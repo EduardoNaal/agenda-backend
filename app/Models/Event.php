@@ -2,30 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Event extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'title', // Título del evento
-        'description', // Descripción del evento (opcional)
-        'start_time', // Fecha y hora de inicio
-        'end_time', // Fecha y hora de finalización
-        'contact_id', // Clave foránea para relacionar con el contacto
+        'title',
+        'description',
+        'start_time',
+        'end_time',
+        'user_id', // Ahora está relacionado con el usuario
     ];
 
-    // Relación con contactos
-    public function contact()
+    public function user()
     {
-        return $this->belongsTo(Contact::class);
-    }
-
-    // Relación con recordatorios
-    public function reminders()
-    {
-        return $this->hasMany(Reminder::class);
+        return $this->belongsTo(User::class);
     }
 }
+
