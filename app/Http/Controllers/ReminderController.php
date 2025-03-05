@@ -14,7 +14,7 @@ class ReminderController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
+        if ($user->hasRole('admin')) {
             // Si es admin, obtiene todos los recordatorios
             $reminders = Reminder::all();
         } else {
@@ -37,7 +37,7 @@ class ReminderController extends Controller
 
         // Verificar que el evento pertenezca al usuario autenticado
         $event = Event::find($validated['event_id']);
-        if ($event->contact->user_id !== Auth::user()->id && !Auth::user()->isAdmin()) {
+        if ($event->contact->user_id !== Auth::user()->id && !Auth::user()->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -52,7 +52,7 @@ class ReminderController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del recordatorio o un admin puede verlo
-        if ($reminder->event->contact->user_id !== $user->id && !$user->isAdmin()) {
+        if ($reminder->event->contact->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -65,7 +65,7 @@ class ReminderController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del recordatorio o un admin puede actualizarlo
-        if ($reminder->event->contact->user_id !== $user->id && !$user->isAdmin()) {
+        if ($reminder->event->contact->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -85,12 +85,12 @@ class ReminderController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del recordatorio o un admin puede eliminarlo
-        if ($reminder->event->contact->user_id !== $user->id && !$user->isAdmin()) {
+        if ($reminder->event->contact->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
         $reminder->delete();
 
-        return response()->noContent();
+        return response()->json(['message' => 'Recordatorio eliminado correctamente'], 200);
     }
 }

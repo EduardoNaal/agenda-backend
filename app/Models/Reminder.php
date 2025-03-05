@@ -10,7 +10,9 @@ class Reminder extends Model
     use HasFactory;
 
     protected $fillable = [
-        'event_id', 'reminder_time', 'sent',
+        'event_id', // Clave foránea para relacionar con el evento
+        'reminder_time', // Fecha y hora del recordatorio
+        'sent', // Indica si el recordatorio fue enviado
     ];
 
     // Relación con eventos

@@ -13,7 +13,7 @@ class ContactController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
+        if ($user->hasRole('admin')) {
             // Si es admin, obtiene todos los contactos
             $contacts = Contact::with('user')->get();
         } else {
@@ -48,7 +48,7 @@ class ContactController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del contacto o un admin puede verlo
-        if ($contact->user_id !== $user->id && !$user->isAdmin()) {
+        if ($contact->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -61,7 +61,7 @@ class ContactController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del contacto o un admin puede actualizarlo
-        if ($contact->user_id !== $user->id && !$user->isAdmin()) {
+        if ($contact->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -83,7 +83,7 @@ class ContactController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del contacto o un admin puede eliminarlo
-        if ($contact->user_id !== $user->id && !$user->isAdmin()) {
+        if ($contact->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 

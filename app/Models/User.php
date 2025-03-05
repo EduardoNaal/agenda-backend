@@ -6,38 +6,40 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
+        'name', // Nombre del usuario
+        'email', // Correo electrónico
+        'password', // Contraseña
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', // Ocultar contraseña en las respuestas
+        'remember_token', // Ocultar token de recordar sesión
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime', // Convertir a tipo datetime
+            'password' => 'hashed', // Convertir contraseña a hash
+        ];
+    }
 
-    // relación con contactos
+    // Relación con contactos
     public function contacts()
     {
         return $this->hasMany(Contact::class);
     }
 
-    // verificar si el usuario es administrador
+    // Verificar si el usuario es administrador
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return $this->hasRole('admin'); // Usar hasRole de Spatie
     }
 }
-
-

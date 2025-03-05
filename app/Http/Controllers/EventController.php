@@ -14,7 +14,7 @@ class EventController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
+        if ($user->hasRole('admin')) {
             // Si es admin, obtiene todos los eventos
             $events = Event::all();
         } else {
@@ -42,7 +42,7 @@ class EventController extends Controller
         $contact = Contact::find($validated['contact_id']);
 
         // Verificar que el contacto pertenezca al usuario autenticado
-        if ($contact->user_id !== $user->id && !$user->isAdmin()) {
+        if ($contact->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -57,7 +57,7 @@ class EventController extends Controller
         $user = Auth::user();
 
         // Verificar si el evento tiene un contacto asociado y si el usuario tiene permiso
-        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->isAdmin())) {
+        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->hasRole('admin'))) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -70,7 +70,7 @@ class EventController extends Controller
         $user = Auth::user();
 
         // Verificar si el evento tiene un contacto asociado y si el usuario tiene permiso
-        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->isAdmin())) {
+        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->hasRole('admin'))) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -93,12 +93,12 @@ class EventController extends Controller
         $user = Auth::user();
 
         // Verificar si el evento tiene un contacto asociado y si el usuario tiene permiso
-        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->isAdmin())) {
+        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->hasRole('admin'))) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
         $event->delete();
 
-        return response()->noContent();
+        return response()->json(['message' => 'Evento eliminado correctamente'], 200);
     }
 }

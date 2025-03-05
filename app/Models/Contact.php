@@ -12,11 +12,11 @@ class Contact extends Model
     protected $table = 'contacts';
 
     protected $fillable = [
-        'name',
-        'email',
-        'phone',
-        'notes',
-        'user_id',
+        'name', // Nombre del contacto
+        'email', // Correo electrónico
+        'phone', // Número de teléfono (opcional)
+        'notes', // Notas adicionales (opcional)
+        'user_id', // Clave foránea para relacionar con el usuario
     ];
 
     // Relación con users

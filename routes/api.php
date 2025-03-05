@@ -8,24 +8,24 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']); // Registrar un nuevo usuario
+Route::post('/login', [AuthController::class, 'login']); // Iniciar sesión
 
-// Rutas protegidas
+// Rutas protegidas (requieren autenticación)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout']); // Cerrar sesión
 
-    // Contactos
+    // Contactos: Rutas RESTful para gestionar contactos
     Route::apiResource('contacts', ContactController::class);
 
-    // Eventos
+    // Eventos: Rutas RESTful para gestionar eventos
     Route::apiResource('events', EventController::class);
 
-    // Recordatorios
+    // Recordatorios: Rutas RESTful para gestionar recordatorios
     Route::apiResource('reminders', ReminderController::class);
 
     // Rutas solo para administradores
     Route::middleware('admin')->group(function () {
-        Route::get('/admin/users', [UserController::class, 'index']); // Ejemplo de ruta solo para admin
+        Route::get('/admin/users', [UserController::class, 'index']); // Listar todos los usuarios (solo para admin)
     });
 });

@@ -15,10 +15,17 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && $request->user()->isAdmin()) {
+        // Verificar si el usuario está autenticado
+        if (!$request->user()) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        // Verificar si el usuario tiene el rol de administrador
+        if ($request->user()->hasRole('admin')) {
             return $next($request);
         }
 
-        return response()->json(['message' => 'No autorizado'], 403);
+        // Si el usuario no es administrador, devolver un error 403
+        return response()->json(['message' => 'Acceso denegado: se requiere rol de administrador'], 403);
     }
 }

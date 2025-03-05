@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -18,7 +19,6 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'sometimes|in:admin,user', // opcional, por defecto es 'user'
         ]);
 
         // Crear usuario
@@ -26,8 +26,13 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => $validated['role'] ?? 'user', // por defecto es 'user'
         ]);
+
+        // Verificar si el rol "user" existe, si no, crearlo
+        $role = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
+
+        // Asignar el rol al usuario
+        $user->assignRole($role);
 
         // Crear token
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -38,7 +43,7 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $user->role,
+                'role' => $user->getRoleNames()->first(), // Obtener el primer rol del usuario
             ],
         ], 201);
     }
@@ -75,7 +80,7 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $user->role,
+                'role' => $user->getRoleNames()->first(), // Obtener el primer rol del usuario
             ],
         ], 200);
     }
