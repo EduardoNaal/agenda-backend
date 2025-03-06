@@ -6,6 +6,7 @@ use App\Models\Reminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Event;
+use App\Notifications\ReminderNotification;
 
 class ReminderController extends Controller
 {
@@ -27,26 +28,38 @@ class ReminderController extends Controller
     // Crear un nuevo recordatorio
     public function store(Request $request)
     {
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'reminder_time' => 'required|date',
-            'event_id' => 'required|exists:events,id',
-        ]);
-
-        // Verificar que el evento pertenezca al usuario autenticado
-        $event = Event::find($validated['event_id']);
-        if ($event->user_id !== $user->id && !$user->hasRole('admin')) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        try {
+            // Validar los datos del recordatorio
+            $validated = $request->validate([
+                'reminder_time' => 'required|date',
+                'event_id' => 'required|exists:events,id',
+            ]);
+    
+            $user = Auth::user();
+    
+            // Obtener el evento y verificar acceso
+            $event = Event::findOrFail($validated['event_id']);
+            if ($event->user_id !== $user->id && !$user->hasRole('admin')) {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+    
+            // Asignar el user_id al recordatorio
+            $validated['user_id'] = $user->id;
+    
+            // Crear el recordatorio
+            $reminder = Reminder::create($validated);
+    
+            // Enviar notificación por correo
+            $user->notify(new ReminderNotification($reminder));
+    
+            return response()->json($reminder, 201);
+        } catch (\Exception $e) {
+            // Capturar cualquier excepción y devolver el mensaje de error
+            \Log::error('Error al crear el recordatorio: ' . $e->getMessage());
+            return response()->json(['message' => 'Error al crear el recordatorio', 'error' => $e->getMessage()], 500);
         }
-
-        // Asignar el user_id al recordatorio
-        $validated['user_id'] = $user->id;
-
-        $reminder = Reminder::create($validated);
-
-        return response()->json($reminder, 201);
     }
+    
 
     // Obtener un recordatorio por ID
     public function show(Reminder $reminder)

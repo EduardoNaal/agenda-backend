@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
@@ -24,22 +25,33 @@ class EventController extends Controller
 
 
     // Crear un nuevo evento
+    
     public function store(Request $request)
     {
+        // Agregar esta línea para depuración
+        Log::info('Datos recibidos: ', $request->all());
+    
         $validated = $request->validate([
             'title' => 'required|string',
             'description' => 'nullable|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
         ]);
-
+    
+        // Agregar esta línea para depuración
+        Log::info('Datos validados: ', $validated);
+    
         $user = Auth::user();
         $validated['user_id'] = $user->id; // Asigna el evento al usuario autenticado
-
+    
         $event = Event::create($validated);
-
+    
+        // Agregar esta línea para depuración
+        Log::info('Evento creado: ', $event->toArray());
+    
         return response()->json($event, 201);
     }
+    
 
 
     // Obtener un evento por ID
