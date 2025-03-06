@@ -18,10 +18,7 @@ class ReminderController extends Controller
             // Si es admin, obtiene todos los recordatorios
             $reminders = Reminder::all();
         } else {
-            // Si es usuario normal, obtiene solo sus recordatorios
-            $reminders = Reminder::whereHas('event.contact', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })->get();
+            $reminders = Reminder::where('user_id', $user->id)->get();  // Si es usuario normal, obtiene solo sus recordatorios
         }
 
         return response()->json($reminders);
@@ -30,6 +27,8 @@ class ReminderController extends Controller
     // Crear un nuevo recordatorio
     public function store(Request $request)
     {
+        $user = Auth::user();
+
         $validated = $request->validate([
             'reminder_time' => 'required|date',
             'event_id' => 'required|exists:events,id',
@@ -37,9 +36,12 @@ class ReminderController extends Controller
 
         // Verificar que el evento pertenezca al usuario autenticado
         $event = Event::find($validated['event_id']);
-        if ($event->contact->user_id !== Auth::user()->id && !Auth::user()->hasRole('admin')) {
+        if ($event->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
+
+        // Asignar el user_id al recordatorio
+        $validated['user_id'] = $user->id;
 
         $reminder = Reminder::create($validated);
 
@@ -52,7 +54,7 @@ class ReminderController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del recordatorio o un admin puede verlo
-        if ($reminder->event->contact->user_id !== $user->id && !$user->hasRole('admin')) {
+        if ($reminder->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -65,7 +67,7 @@ class ReminderController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del recordatorio o un admin puede actualizarlo
-        if ($reminder->event->contact->user_id !== $user->id && !$user->hasRole('admin')) {
+        if ($reminder->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -85,7 +87,7 @@ class ReminderController extends Controller
         $user = Auth::user();
 
         // Solo el dueño del recordatorio o un admin puede eliminarlo
-        if ($reminder->event->contact->user_id !== $user->id && !$user->hasRole('admin')) {
+        if ($reminder->user_id !== $user->id && !$user->hasRole('admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 

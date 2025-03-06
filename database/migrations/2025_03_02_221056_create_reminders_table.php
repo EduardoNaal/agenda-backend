@@ -13,7 +13,10 @@ return new class extends Migration
             $table->dateTime('reminder_time'); // Fecha y hora del recordatorio
             $table->boolean('sent')->default(false); // Indica si el recordatorio fue enviado
             $table->foreignId('event_id')->constrained()->onDelete('cascade'); // Relación con la tabla events
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con la tabla users
             $table->timestamps(); // Fechas de creación y actualización
+
+            $table->unique(['reminder_time', 'event_id', 'user_id']); // Restricción única para fecha y hora del recordatorio, evento y usuario
         });
     }
 

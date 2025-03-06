@@ -14,7 +14,7 @@ return new class extends Migration
             $table->text('description')->nullable(); // Descripción del evento (opcional)
             $table->dateTime('start_time'); // Fecha y hora de inicio
             $table->dateTime('end_time'); // Fecha y hora de finalización
-            $table->foreignId('contact_id')->constrained()->onDelete('cascade'); // Relación con la tabla contacts
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con la tabla users
             $table->timestamps(); // Fechas de creación y actualización
         });
     }

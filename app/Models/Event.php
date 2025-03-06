@@ -10,16 +10,23 @@ class Event extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'description',
-        'start_time',
-        'end_time',
-        'user_id', // Ahora está relacionado con el usuario
+        'title', // Título del evento
+        'description', // Descripción del evento (opcional)
+        'start_time', // Fecha y hora de inicio
+        'end_time', // Fecha y hora de finalización
+        'user_id', // Clave foránea para relacionar con el usuario
     ];
 
+    // Relación con users
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relación con recordatorios
+    public function reminder()
+    {
+        return $this->hasMany(Reminder::class);
     }
 }
 
