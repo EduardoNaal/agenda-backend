@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 
+
 class AuthController extends Controller
 {
     // Registrar usuario
@@ -83,6 +84,8 @@ class AuthController extends Controller
                 'role' => $user->getRoleNames()->first(), // Obtener el primer rol del usuario
             ],
         ], 200);
+
+        
     }
 
     // Cerrar sesión

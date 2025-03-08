@@ -6,6 +6,8 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']); // Registrar un nuevo usuario
@@ -13,7 +15,7 @@ Route::post('/login', [AuthController::class, 'login']); // Iniciar sesión
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']); // Cerrar sesión
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');// Cerrar sesión
 
     // Contactos: Rutas RESTful para gestionar contactos
     Route::apiResource('contacts', ContactController::class);
