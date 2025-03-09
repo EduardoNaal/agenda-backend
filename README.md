@@ -23,7 +23,7 @@
 
 # **Gestión de Contactos y Eventos con Laravel**
 
-Este proyecto es una API RESTful construida con **Laravel** que permite gestionar contactos, eventos y recordatorios. Está diseñado para ser escalable, seguro y fácil de integrar con aplicaciones frontend.
+Este proyecto es una API REST construida con **Laravel** que permite gestionar contactos, eventos y recordatorios.
 
 ---
 
@@ -221,4 +221,4 @@ $schedule->call(function () {
 ---
 
 ## **Licencia**
-Este proyecto está bajo la licencia MIT.
+Este proyecto está bajo la MIT Licent.
