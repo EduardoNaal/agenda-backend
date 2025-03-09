@@ -25,33 +25,33 @@ class EventController extends Controller
 
 
     // Crear un nuevo evento
-    
+
     public function store(Request $request)
     {
         // Agregar esta línea para depuración
         Log::info('Datos recibidos: ', $request->all());
-    
+
         $validated = $request->validate([
             'title' => 'required|string',
             'description' => 'nullable|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
         ]);
-    
+
         // Agregar esta línea para depuración
         Log::info('Datos validados: ', $validated);
-    
+
         $user = Auth::user();
         $validated['user_id'] = $user->id; // Asigna el evento al usuario autenticado
-    
+
         $event = Event::create($validated);
-    
+
         // Agregar esta línea para depuración
         Log::info('Evento creado: ', $event->toArray());
-    
+
         return response()->json($event, 201);
     }
-    
+
 
 
     // Obtener un evento por ID
@@ -92,16 +92,16 @@ class EventController extends Controller
 
     // Eliminar un evento
     public function destroy(Event $event)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        // Verificar si el evento tiene un contacto asociado y si el usuario tiene permiso
-        if (!$event->contact || ($event->contact->user_id !== $user->id && !$user->hasRole('admin'))) {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-
-        $event->delete();
-
-        return response()->json(['message' => 'Evento eliminado correctamente'], 200);
+    // Verificar si eres admin puedes eliminar cualquier evento o si eres el dueño del evento
+    if ($event->user_id !== $user->id && !$user->hasRole('admin')) {
+        return response()->json(['message' => 'No autorizado'], 403);
     }
+
+    $event->delete();
+
+    return response()->json(['message' => 'Evento eliminado correctamente'], 200);
+}
 }
